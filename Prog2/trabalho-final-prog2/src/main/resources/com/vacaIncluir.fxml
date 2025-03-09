@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.VacaIncluirControle">
+   <children>
+      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#voltarMenu" prefHeight="25.0" prefWidth="108.0" styleClass="txt14" text="Menu" />
+      <Label layoutX="130.0" layoutY="137.0" text="Brinco*" />
+      <Label layoutX="130.0" layoutY="192.0" text="Nome" />
+      <Label layoutX="130.0" layoutY="239.0" text="Raça*" />
+      <TextField fx:id="campoBrinco" layoutX="225.0" layoutY="138.0" prefHeight="35.0" prefWidth="191.0" />
+      <TextField fx:id="campoNome" layoutX="225.0" layoutY="188.0" prefHeight="35.0" prefWidth="191.0" />
+      <TextField fx:id="campoRaca" layoutX="225.0" layoutY="240.0" prefHeight="35.0" prefWidth="191.0" />
+      <Label layoutX="227.0" layoutY="85.0" text="Cadastro de Vaca" />
+      <Button layoutX="189.0" layoutY="306.0" mnemonicParsing="false" onAction="#voltarMenu" styleClass="txt14" text="Cancelar" />
+      <Button layoutX="304.0" layoutY="306.0" mnemonicParsing="false" onAction="#gravar" prefHeight="34.0" prefWidth="99.0" styleClass="txt14" text="Gravar" />
+   </children>
+</AnchorPane>

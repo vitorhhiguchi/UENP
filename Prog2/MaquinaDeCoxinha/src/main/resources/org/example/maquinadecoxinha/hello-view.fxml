@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.maquinadecoxinha.MaquinaDeCoxinhaController">
+    <children>
+        <TextField fx:id="estoqueDeCoxinhas" editable="false" layoutX="228.0" layoutY="109.0" onAction="#atualizarEstoque" text="Estoque: 0" />
+        <Button fx:id="zerar" layoutX="251.0" layoutY="350.0" mnemonicParsing="false" onAction="#zerarMaquina" text="Zerar a Máquina" />
+        <Button fx:id="vender" layoutX="404.0" layoutY="242.0" mnemonicParsing="false" onAction="#venderQuantasQuiser" text="Vender" />
+        <Label fx:id="labelAbastecer" layoutX="277.0" layoutY="149.0" text="Abastecer" />
+        <Label fx:id="labelVender" layoutX="280.0" layoutY="214.0" text="Vender" />
+      <TextField fx:id="campoAbastece" layoutX="228.0" layoutY="174.0" />
+      <TextField fx:id="campoDeVenda" layoutX="225.0" layoutY="242.0" />
+      <Label fx:id="titulo" layoutX="170.0" layoutY="57.0" text="MÁQUINA DE COXINHA">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="enviarPedido1" layoutX="268.0" layoutY="275.0" mnemonicParsing="false" onAction="#venderUmaCoxinha" text="Vender 1" />
+      <Button fx:id="abastecer" layoutX="404.0" layoutY="174.0" mnemonicParsing="false" onAction="#abastecer" text="Abastecer" />
+    </children>
+</AnchorPane>

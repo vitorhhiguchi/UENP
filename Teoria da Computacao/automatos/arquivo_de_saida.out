@@ -1,0 +1,8 @@
+input;expected;result;time
+
+ba;1;1;0.068
+aaaabbbbbaaaaa;1;1;0.018
+abababab;0;0;0.004
+bbbbbbbb;0;0;0.011
+aaaaaaaaaaaa;0;0;0.007
+aaaaabaaaaa;1;1;0.003

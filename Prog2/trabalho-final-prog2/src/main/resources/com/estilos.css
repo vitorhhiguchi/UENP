@@ -1,0 +1,29 @@
+/* 
+    Created on : 6 de nov. de 2024, 13:55:30
+    Author     : José
+*/
+
+Label{
+    -fx-font-family: "Arial";
+    -fx-font-size: 16pt;
+}
+
+TextField{
+    -fx-font-size: 14pt;
+    -fx-font-family: "Courier New";
+}
+
+.txt14{
+    -fx-font-family: "Arial";
+    -fx-font-size: 14pt;
+}
+
+.txt16{
+    -fx-font-family: "Arial";
+    -fx-font-size: 16pt;
+}
+
+.txt18{
+    -fx-font-family: "Arial";
+    -fx-font-size: 18pt;
+}

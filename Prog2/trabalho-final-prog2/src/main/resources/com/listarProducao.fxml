@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="168.0" layoutY="33.0" text="Listar Produção por Vaca">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="161.0" layoutY="103.0" text="Vaca">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="comboVaca" layoutX="224.0" layoutY="104.0" prefWidth="150.0" />
+      <TableView fx:id="tabelaProducao" layoutX="199.0" layoutY="162.0" prefHeight="200.0" prefWidth="200.0" />
+   </children>
+</AnchorPane>

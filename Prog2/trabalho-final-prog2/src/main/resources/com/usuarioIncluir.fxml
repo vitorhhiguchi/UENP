@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.UsuarioIncluirControle">
+   <children>
+      <Button layoutX="24.0" layoutY="24.0" mnemonicParsing="false" onAction="#voltarMenu" prefHeight="25.0" prefWidth="108.0" styleClass="txt14" text="Menu">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Label layoutX="192.0" layoutY="90.0" text="Cadastro de Usuário">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="102.0" layoutY="147.0" text="Login">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <TextField fx:id="campoLogin" layoutX="200.0" layoutY="147.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="campoNome" layoutX="200.0" layoutY="200.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </TextField>
+      <Label layoutX="102.0" layoutY="200.0" text="Nome">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="102.0" layoutY="256.0" text="Senha">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Button layoutX="200.0" layoutY="311.0" mnemonicParsing="false" onAction="#cancelar" text="Cancelar">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button layoutX="323.0" layoutY="311.0" mnemonicParsing="false" onAction="#gravar" text="Gravar">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <PasswordField fx:id="campoSenha" layoutX="200.0" layoutY="255.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </PasswordField>
+   </children>
+</AnchorPane>
