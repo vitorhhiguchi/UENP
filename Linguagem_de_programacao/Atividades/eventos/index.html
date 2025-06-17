@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Seminário Prático de Eventos JS</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      .box {
+        width: 300px;
+        height: 100px;
+        border: 2px solid black;
+        background-color: lightgray;
+        text-align: center;
+        line-height: 100px;
+        margin-top: 10px;
+      }
+      input {
+        margin-top: 10px;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body onload="paginaCarregada()">
+    <h1>Eventos Comuns em JavaScript</h1>
+    <p id="info">Aqui aparecerão as informações dos eventos.</p>
+
+    <button onclick="exibirAlerta()">Clique em Mim!</button>
+
+    <div
+      class="box"
+      onmouseover="mudarCorFundo(this, 'lightblue')"
+      onmouseout="mudarCorFundo(this, 'lightgray')"
+      ondblclick="mudarBorda(this)"
+    >
+      Passe o mouse sobre mim
+    </div>
+
+    <input
+      type="text"
+      onkeydown="teclaPressionada()"
+      placeholder="Pressione uma tecla aqui..."
+    />
+
+    <input
+      type="text"
+      onchange="atualizarBox(this)"
+      placeholder="Digite algo e saia do campo..."
+    />
+
+    <script>
+      const infoParagraph = document.getElementById("info");
+      const h1 = document.querySelector("h1");
+      const box = document.querySelector(".box");
+
+      function paginaCarregada() {
+        infoParagraph.textContent = "A página terminou de carregar!";
+      }
+
+      // --- Solução do Desafio 1 ---
+      function exibirAlerta() {
+        h1.textContent = "Botão Clicado!"; // Muda o texto do <h1>
+        infoParagraph.textContent = 'Evento "onclick" disparado.';
+      }
+
+      function mudarCorFundo(elemento, cor) {
+        elemento.style.backgroundColor = cor;
+        if (cor === "lightblue") {
+          infoParagraph.textContent = 'Evento "onmouseover" ativado.';
+        } else {
+          infoParagraph.textContent = 'Evento "onmouseout" ativado.';
+        }
+      }
+
+      function teclaPressionada() {
+        infoParagraph.textContent =
+          'Evento "onkeydown": você pressionou uma tecla no campo de input!';
+      }
+
+      // --- Solução do Desafio 2 ---
+      function atualizarBox(inputElement) {
+        box.textContent = inputElement.value; // Pega o valor do input e coloca na div.box
+        infoParagraph.textContent = 'Evento "onchange" disparado.';
+      }
+
+      // --- Solução do Desafio 3 ---
+      function mudarBorda(elemento) {
+        elemento.style.borderColor = "red"; // Muda a cor da borda para vermelho
+        infoParagraph.textContent = 'Evento "ondblclick" disparado.';
+      }
+    </script>
+  </body>
+</html>
