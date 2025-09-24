@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de Controle FPV</title>
+    <style>
+        body { font-family: sans-serif; background-color: #282c34; color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: #61dafb; }
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; width: 100%; }
+        .camera-view, .controls { border: 2px solid #61dafb; border-radius: 8px; padding: 20px; background-color: #20232a; }
+        .camera-view img { max-width: 100%; height: auto; background-color: black; }
+        .controls { text-align: center; }
+        #status.conectado { color: #98c379; }
+        #status.desconectado { color: #e06c75; }
+        input, button { padding: 8px; border-radius: 5px; border: 1px solid #61dafb; background-color: #282c34; color: white; }
+        button { cursor: pointer; background-color: #61dafb; color: #20232a; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Painel de Controle FPV do Carrinho</h1>
+
+    <div class="container">
+        <div class="camera-view">
+            <h2>Câmera</h2>
+            <div>
+                <input type="text" id="esp32-ip" placeholder="Digite o IP do ESP32 aqui">
+                <button onclick="startCamera()">Iniciar Câmera</button>
+            </div>
+            <img id="camera-stream" src="" alt="Aguardando stream da câmera...">
+        </div>
+
+        <div class="controls">
+            <h2>Controles</h2>
+            <p id="status" class="desconectado">Desconectado do Servidor de Controle</p>
+            <p>Valores Atuais: <br><strong id="comando">{y: 0, x: 0}</strong></p>
+            <p>Conecte o controle e pressione um botão para ativá-lo.</p>
+        </div>
+    </div>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const comandoEl = document.getElementById('comando');
+        const ipInput = document.getElementById('esp32-ip');
+        const cameraStream = document.getElementById('camera-stream');
+
+        // --- Lógica do WebSocket (Controle) ---
+        const socket = new WebSocket('ws://localhost:8080');
+        socket.onopen = () => { statusEl.textContent = 'Conectado ao Servidor'; statusEl.className = 'conectado'; };
+        socket.onclose = () => { statusEl.textContent = 'Desconectado do Servidor'; statusEl.className = 'desconectado'; };
+
+        let lastStickValues = { x: 0, y: 0 };
+        const DEAD_ZONE = 0.2;
+
+        function gameLoop() {
+            const gamepads = navigator.getGamepads();
+            if (!gamepads[0]) return;
+            const controller = gamepads[0];
+            let yValue = Math.abs(controller.axes[1]) > DEAD_ZONE ? controller.axes[1] : 0;
+            let xValue = Math.abs(controller.axes[2]) > DEAD_ZONE ? controller.axes[2] : 0;
+            if (xValue !== lastStickValues.x || yValue !== lastStickValues.y) {
+                const dataToSend = { y: yValue, x: xValue };
+                socket.send(JSON.stringify(dataToSend));
+                comandoEl.innerHTML = `Y: ${yValue.toFixed(2)} <br> X: ${xValue.toFixed(2)}`;
+                lastStickValues = { x: xValue, y: yValue };
+            }
+            requestAnimationFrame(gameLoop);
+        }
+        window.addEventListener("gamepadconnected", () => gameLoop());
+
+        // --- Lógica da Câmera ---
+        function startCamera() {
+            const ip = ipInput.value;
+            if (ip) {
+                // O servidor de stream da ESP32-CAM geralmente roda na porta 81
+                cameraStream.src = `http://${ip}:81/stream`;
+            } else {
+                alert("Por favor, insira o endereço IP do ESP32.");
+            }
+        }
+    </script>
+</body>
+</html>
