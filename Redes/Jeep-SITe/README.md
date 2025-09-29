@@ -8,7 +8,9 @@ Repositório do projeto **campeão da UENP Race**, uma competição de carrinhos
 
 O objetivo principal era criar um carrinho controlado remotamente via web, aplicando na prática conceitos de **Redes de Computadores**, especialmente os protocolos da camada de transporte como TCP e UDP.
 
-![foto_do_carrinho] ## 🚀 Funcionalidades
+![Foto do meu carrinho campeão](./assets/carrinho.jpeg)
+
+## 🚀 Funcionalidades
 
 - **Controle Remoto em Tempo Real:** Comandos enviados a partir de uma interface web.
 - **Streaming de Vídeo:** Visualização da câmera do carrinho (ESP32-CAM) diretamente no navegador.
@@ -50,9 +52,10 @@ A comunicação é baseada em um modelo cliente-servidor:
 
 ```
 .
-├── carrinho/           # Código fonte para o ESP32
-├── servidor-principal/ # Código do servidor principal em Node.js
-└── servidor-testes/    # Servidor utilizado para testes iniciais
+├── CARRINHO/           # Código fonte para o ESP32
+├── CameraWebServer/    # Código fonte para o ESP32Cam
+├── uenp-race/          # Código do servidor principal em Node.js
+└── car-test/           # Servidor utilizado para testes iniciais
 ```
 
 ## ⚙️ Como Configurar e Executar
@@ -70,21 +73,21 @@ Siga os passos abaixo para rodar o projeto.
 Primeiro, clone o repositório:
 ```bash
 git clone [https://github.com/vitorhhiguchi/UENP.git](https://github.com/vitorhhiguchi/UENP.git)
-cd UENP/Redes
+cd UENP/Redes/Jeep-SITe
 ```
 
 Agora, configure e inicie o servidor:
 ```bash
 # Navegue até a pasta do servidor
-cd servidor-principal
+cd uenp-race
 
 # Instale as dependências
 npm install
 
 # Inicie o servidor
-npm start
+node server.js
 ```
-O servidor estará rodando no seu IP local, na porta especificada no código (geralmente `3000`). Anote o endereço de IP da sua máquina na rede local (ex: `192.168.1.10`).
+O servidor estará rodando no seu IP local, na porta especificada no código (`8080`). Anote o endereço de IP da sua máquina na rede local (ex: `192.168.1.10`).
 
 ---
 
@@ -100,4 +103,27 @@ O servidor estará rodando no seu IP local, na porta especificada no código (ge
 4.  **Configure o IP do Servidor:** Insira o endereço de IP da máquina onde o servidor principal está rodando.
     ```cpp
     // Exemplo:
-    web
+    webSocket.begin("192.168.1.10", 8080, "/");
+    ```
+5.  **Faça o Upload:**
+    - Conecte seu ESP32 ao computador.
+    - Em `Ferramentas > Placa`, selecione "ESP32 Dev Module" (ou a placa correspondente).
+    - Selecione a porta COM correta.
+    - Clique em "Carregar".
+
+## 🎮 Como Usar
+
+1.  Certifique-se de que o **servidor principal está rodando**.
+2.  Ligue o carrinho. Você pode abrir o Monitor Serial na Arduino IDE para ver os logs de conexão.
+3.  No seu navegador, acesse o endereço do servidor: `http://[IP_DO_SEU_SERVIDOR]:8080`.
+4.  A interface de controle será carregada. Agora você pode:
+    - Usar as **setas do teclado** para mover o carrinho.
+    - Conectar um **gamepad** ao computador para um controle mais preciso.
+
+## 📜 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+---
+
+Feito com 💙 por **Vitor H. Higuchi**
