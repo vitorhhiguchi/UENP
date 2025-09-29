@@ -1,0 +1,26 @@
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: pink;
+}
+
+.botao-colega {
+    padding: 20px 26px;
+    background-color: deeppink;
+    border-radius: 8px;
+    color: #FFF;
+    text-decoration: none;
+}
+
+.botao-colega:hover {
+    background-color: rgb(211, 24, 123);
+    color: #ffffff;
+}
