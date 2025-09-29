@@ -126,4 +126,4 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-Feito com 💙 por **Vitor H. Higuchi**
+Feito por **Vitor H. Higuchi**, **Danilo Augusto Salvego** e **Ozeias Moreira da Rocha Júnior**
