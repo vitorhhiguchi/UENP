@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle do Carro</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    h1 {
+      color: #333;
+      margin: 0;
+    }
+    
+    .car-info {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .back-btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .back-btn:hover {
+      background: #2980b9;
+    }
+    
+    .main-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+    
+    .video-container {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .video-title {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    
+    .video-stream {
+      width: 100%;
+      max-width: 640px;
+      height: 480px;
+      background: #000;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+    
+    .video-placeholder {
+      width: 100%;
+      max-width: 640px;
+      height: 480px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 16px;
+      margin: 0 auto;
+    }
+    
+    .controls-container {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .controls-title {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 18px;
+      text-align: center;
+    }
+    
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      max-width: 200px;
+      margin: 0 auto;
+    }
+    
+    .control-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 20px;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: bold;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    
+    .control-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .control-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .control-btn:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .forward {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    
+    .left {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    
+    .backward {
+      grid-column: 2;
+      grid-row: 2;
+    }
+    
+    .right {
+      grid-column: 3;
+      grid-row: 2;
+    }
+    
+    .keyboard-info {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .status {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+    }
+    
+    .status.connected {
+      background: #d5f4e6;
+      color: #27ae60;
+    }
+    
+    .status.disconnected {
+      background: #fadbd8;
+      color: #e74c3c;
+    }
+    
+    .error {
+      background: #e74c3c;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .video-stream, .video-placeholder {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎮 Controle do Carro</h1>
+    <div class="car-info">
+      Carro: <span id="carId"></span>
+      <a href="/carros.html" class="back-btn">Voltar</a>
+    </div>
+  </div>
+  
+  <div id="error" class="error" style="display: none;"></div>
+  
+  <div class="main-content">
+    <div class="video-container">
+      <div class="video-title">📹 Transmissão ao Vivo</div>
+      <div id="videoContainer">
+        <div class="video-placeholder">
+          Carregando transmissão...
+        </div>
+      </div>
+    </div>
+    
+    <div class="controls-container">
+      <div class="controls-title">🎯 Controles</div>
+      
+      <div class="control-grid">
+        <button class="control-btn forward" id="forwardBtn" onclick="sendCommand('forward')">
+          ⬆️
+        </button>
+        
+        <button class="control-btn left" id="leftBtn" onclick="sendCommand('left')">
+          ⬅️
+        </button>
+        
+        <button class="control-btn backward" id="backwardBtn" onclick="sendCommand('backward')">
+          ⬇️
+        </button>
+        
+        <button class="control-btn right" id="rightBtn" onclick="sendCommand('right')">
+          ➡️
+        </button>
+      </div>
+      
+      <div class="keyboard-info">
+        <strong>Controles Disponíveis:</strong><br>
+        <strong>Teclado:</strong> ⬆️⬇️⬅️➡️ Setas<br>
+        <strong>Controle PlayStation:</strong> D-Pad ou Analógico<br>
+        <strong>Mouse:</strong> Clique nos botões
+      </div>
+      
+      <div id="status" class="status disconnected">
+        Desconectado
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws;
+    let currentUser;
+    let carId;
+    let streamUrl;
+    let isConnected = false;
+    
+    // Variáveis para controle de PlayStation
+    const DEAD_ZONE = 0.3;
+    let lastStickValues = { x: 0, y: 0 };
+    let gamepadConnected = false;
+
+    // Obter parâmetros da URL
+    function getUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      carId = urlParams.get('carId');
+      if (!carId) {
+        showError('ID do carro não especificado');
+        return false;
+      }
+      document.getElementById('carId').textContent = carId;
+      return true;
+    }
+
+    // Verificar se usuário está logado
+    function checkAuth() {
+      currentUser = localStorage.getItem('username');
+      if (!currentUser) {
+        window.location.href = '/';
+        return false;
+      }
+      return true;
+    }
+
+    // Conectar WebSocket
+    function connectWebSocket() {
+      //ws = new WebSocket("ws://localhost:8080");
+      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+      ws = new WebSocket(`${protocol}://${window.location.host}`);
+
+
+      ws.onopen = () => {
+        console.log('Conectado ao servidor');
+        isConnected = true;
+        updateStatus('Conectado', true);
+        ws.send(JSON.stringify({ 
+          type: "register_user", 
+          userId: currentUser 
+        }));
+      };
+
+      ws.onmessage = (msg) => {
+        const data = JSON.parse(msg.data);
+        handleWebSocketMessage(data);
+      };
+
+      ws.onclose = () => {
+        console.log('Conexão fechada');
+        isConnected = false;
+        updateStatus('Desconectado', false);
+        setTimeout(connectWebSocket, 3000); // Reconectar após 3 segundos
+      };
+
+      ws.onerror = (error) => {
+        console.error('Erro WebSocket:', error);
+        showError('Erro de conexão com o servidor');
+        isConnected = false;
+        updateStatus('Erro de conexão', false);
+      };
+    }
+
+    // Processar mensagens do WebSocket
+    function handleWebSocketMessage(data) {
+      switch (data.type) {
+        case 'registered':
+          if (data.cars) {
+            const car = data.cars.find(c => c.carId === carId);
+            if (car) {
+              streamUrl = car.streamUrl;
+              setupVideoStream();
+              // Automaticamente selecionar o carro
+              selectCarAutomatically();
+            } else {
+              showError('Carro não encontrado');
+            }
+          }
+          break;
+        case 'car_selected':
+          console.log(`Carro ${data.carId} selecionado com sucesso!`);
+          updateStatus('Conectado - Carro selecionado!', true);
+          break;
+        case 'error':
+          showError(data.message);
+          break;
+      }
+    }
+
+    // Selecionar carro automaticamente
+    function selectCarAutomatically() {
+      if (ws && ws.readyState === WebSocket.OPEN && carId) {
+        ws.send(JSON.stringify({
+          type: "select_car",
+          userId: currentUser,
+          carId: carId
+        }));
+        console.log(`Selecionando carro automaticamente: ${carId}`);
+      }
+    }
+
+    // Configurar stream de vídeo
+    function setupVideoStream() {
+      const videoContainer = document.getElementById('videoContainer');
+      
+      if (streamUrl) {
+        videoContainer.innerHTML = `
+          <img src="${streamUrl}" class="video-stream" alt="Stream do Carro ${carId}">
+        `;
+      } else {
+        videoContainer.innerHTML = `
+          <div class="video-placeholder">
+            Stream não disponível para este carro
+          </div>
+        `;
+      }
+    }
+
+    // Enviar comando para o carro
+    function sendCommand(command) {
+      if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) {
+        showError('Não conectado ao servidor');
+        return;
+      }
+
+      if (!carId) {
+        showError('Nenhum carro selecionado');
+        return;
+      }
+
+      ws.send(JSON.stringify({
+        type: "command",
+        userId: currentUser,
+        command: command
+      }));
+
+      console.log(`Comando enviado: ${command}`);
+    }
+
+    // Enviar comando analógico do controle
+    function sendAnalogCommand(x, y) {
+      if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) {
+        return;
+      }
+
+      if (!carId) {
+        return; // Não mostrar erro para comandos analógicos contínuos
+      }
+
+      ws.send(JSON.stringify({
+        type: "analog_command",
+        userId: currentUser,
+        x: x,
+        y: y
+      }));
+
+      console.log(`Comando analógico enviado: X=${x.toFixed(2)}, Y=${y.toFixed(2)}`);
+    }
+
+    // Atualizar status da conexão
+    function updateStatus(message, connected) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${connected ? 'connected' : 'disconnected'}`;
+    }
+
+    // Mostrar erro
+    function showError(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+
+    // Controles do teclado
+    function handleKeyPress(event) {
+      if (!isConnected) return;
+
+      let buttonId = '';
+      
+      switch (event.code) {
+        case 'ArrowUp':
+          event.preventDefault();
+          buttonId = 'forwardBtn';
+          sendCommand('forward');
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          buttonId = 'backwardBtn';
+          sendCommand('backward');
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          buttonId = 'leftBtn';
+          sendCommand('left');
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          buttonId = 'rightBtn';
+          sendCommand('right');
+          break;
+      }
+
+      // Aplicar efeito visual no botão correspondente
+      if (buttonId) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+          // Efeito de clique
+          button.style.transform = 'scale(0.95)';
+          button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+          
+          // Restaurar após 150ms
+          setTimeout(() => {
+            button.style.transform = 'scale(1)';
+            button.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)';
+          }, 150);
+        }
+      }
+    }
+
+    // Efeitos visuais nos botões
+    function addButtonEffects() {
+      const buttons = document.querySelectorAll('.control-btn');
+      
+      buttons.forEach(btn => {
+        btn.addEventListener('mousedown', () => {
+          btn.style.transform = 'scale(0.95)';
+          btn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+        });
+        
+        btn.addEventListener('mouseup', () => {
+          btn.style.transform = 'scale(1)';
+          btn.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)';
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = 'scale(1)';
+          btn.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)';
+        });
+      });
+    }
+
+    // Função principal do gamepad
+    function gameLoop() {
+      const gamepads = navigator.getGamepads();
+      if (!gamepads[0]) return;
+      
+      const controller = gamepads[0];
+      
+      // Analógico esquerdo (eixos 0 e 1)
+      let yValue = Math.abs(controller.axes[1]) > DEAD_ZONE ? controller.axes[1] : 0;
+      let xValue = Math.abs(controller.axes[0]) > DEAD_ZONE ? controller.axes[0] : 0;
+      
+      // Se houve mudança nos valores do analógico
+      if (xValue !== lastStickValues.x || yValue !== lastStickValues.y) {
+        sendAnalogCommand(xValue, yValue);
+        lastStickValues = { x: xValue, y: yValue };
+      }
+      
+      // Botões direcionais (D-Pad)
+      if (controller.buttons[12] && controller.buttons[12].pressed) { // Cima
+        sendCommand('forward');
+        simulateButtonPress('forwardBtn');
+      }
+      if (controller.buttons[13] && controller.buttons[13].pressed) { // Baixo
+        sendCommand('backward');
+        simulateButtonPress('backwardBtn');
+      }
+      if (controller.buttons[14] && controller.buttons[14].pressed) { // Esquerda
+        sendCommand('left');
+        simulateButtonPress('leftBtn');
+      }
+      if (controller.buttons[15] && controller.buttons[15].pressed) { // Direita
+        sendCommand('right');
+        simulateButtonPress('rightBtn');
+      }
+      
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Simular pressão do botão visualmente
+    function simulateButtonPress(buttonId) {
+      const button = document.getElementById(buttonId);
+      if (button) {
+        button.style.transform = 'scale(0.95)';
+        button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+        
+        setTimeout(() => {
+          button.style.transform = 'scale(1)';
+          button.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)';
+        }, 100);
+      }
+    }
+
+    // Eventos do gamepad
+    window.addEventListener("gamepadconnected", (event) => {
+      console.log("Controle conectado:", event.gamepad.id);
+      gamepadConnected = true;
+      updateStatus('Conectado - Controle detectado!', true);
+      gameLoop();
+    });
+
+    window.addEventListener("gamepaddisconnected", (event) => {
+      console.log("Controle desconectado:", event.gamepad.id);
+      gamepadConnected = false;
+      updateStatus('Conectado', true);
+    });
+
+    // Inicializar página
+    function init() {
+      if (!checkAuth() || !getUrlParams()) {
+        return;
+      }
+      
+      connectWebSocket();
+      addButtonEffects();
+      
+      // Adicionar listener para teclado
+      document.addEventListener('keydown', handleKeyPress);
+      
+      // Focar na página para capturar eventos de teclado
+      document.body.focus();
+    }
+
+    // Iniciar quando a página carregar
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

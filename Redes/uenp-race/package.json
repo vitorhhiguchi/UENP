@@ -1,15 +1,14 @@
 {
-  "name": "carrinho",
+  "name": "servidor",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Ricardo G. Coelho",
   "license": "ISC",
+  "description": "",
   "dependencies": {
     "ws": "^8.18.3"
   }

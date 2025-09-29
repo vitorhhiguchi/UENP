@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seleção de Carros</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    h1 {
+      color: #333;
+      margin: 0;
+    }
+    
+    .user-info {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .logout-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .logout-btn:hover {
+      background: #c0392b;
+    }
+    
+    .cars-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    .car-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    
+    .car-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .car-card.available {
+      border: 3px solid #27ae60;
+    }
+    
+    .car-card.in-use {
+      border: 3px solid #e74c3c;
+      opacity: 0.7;
+    }
+    
+    .car-id {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .car-status {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    
+    .status-available {
+      background: #d5f4e6;
+      color: #27ae60;
+    }
+    
+    .status-in-use {
+      background: #fadbd8;
+      color: #e74c3c;
+    }
+    
+    .car-video {
+      width: 100%;
+      max-width: 280px;
+      height: 200px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .car-video img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+    
+    .select-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    
+    .select-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .select-btn:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .no-cars {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      color: #666;
+    }
+    
+    .loading {
+      text-align: center;
+      color: white;
+      font-size: 18px;
+      margin-top: 50px;
+    }
+    
+    .error {
+      background: #e74c3c;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🚗 Seleção de Carros</h1>
+    <div class="user-info">
+      Usuário: <span id="currentUser"></span>
+      <button class="logout-btn" onclick="logout()">Sair</button>
+    </div>
+  </div>
+  
+  <div id="error" class="error" style="display: none;"></div>
+  <div id="loading" class="loading">Carregando carros disponíveis...</div>
+  <div id="carsContainer" class="cars-container" style="display: none;"></div>
+  <div id="noCars" class="no-cars" style="display: none;">
+    <h2>Nenhum carro disponível</h2>
+    <p>Não há carros conectados no momento. Tente novamente mais tarde.</p>
+  </div>
+
+  <script>
+    let ws;
+    let currentUser;
+    let selectedCarId = null;
+
+    // Verificar se usuário está logado
+    function checkAuth() {
+      currentUser = localStorage.getItem('username');
+      if (!currentUser) {
+        window.location.href = '/';
+        return;
+      }
+      document.getElementById('currentUser').textContent = currentUser;
+    }
+
+    // Função de logout
+    function logout() {
+      localStorage.removeItem('username');
+      if (ws) {
+        ws.close();
+      }
+      window.location.href = '/';
+    }
+
+    // Conectar WebSocket
+    function connectWebSocket() {
+      //ws = new WebSocket("ws://localhost:8080");
+      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+      ws = new WebSocket(`${protocol}://${window.location.host}`);
+
+
+      ws.onopen = () => {
+        console.log('Conectado ao servidor');
+        ws.send(JSON.stringify({ 
+          type: "register_user", 
+          userId: currentUser 
+        }));
+      };
+
+      ws.onmessage = (msg) => {
+        const data = JSON.parse(msg.data);
+        handleWebSocketMessage(data);
+      };
+
+      ws.onclose = () => {
+        console.log('Conexão fechada');
+        setTimeout(connectWebSocket, 3000); // Reconectar após 3 segundos
+      };
+
+      ws.onerror = (error) => {
+        console.error('Erro WebSocket:', error);
+        showError('Erro de conexão com o servidor');
+      };
+    }
+
+    // Processar mensagens do WebSocket
+    function handleWebSocketMessage(data) {
+      switch (data.type) {
+        case 'registered':
+          if (data.cars) {
+            displayCars(data.cars);
+          }
+          break;
+        case 'car_selected':
+          selectedCarId = data.carId;
+          showSuccess(`Conectado ao carro ${data.carId}!`);
+          // Aqui você pode redirecionar para a página de controle do carro
+          setTimeout(() => {
+            window.location.href = `/controle.html?carId=${data.carId}`;
+          }, 2000);
+          break;
+        case 'error':
+          showError(data.message);
+          break;
+      }
+    }
+
+    // Exibir carros disponíveis
+    function displayCars(cars) {
+      const container = document.getElementById('carsContainer');
+      const loading = document.getElementById('loading');
+      const noCars = document.getElementById('noCars');
+
+      loading.style.display = 'none';
+
+      if (cars.length === 0) {
+        noCars.style.display = 'block';
+        return;
+      }
+
+      container.innerHTML = '';
+      cars.forEach(car => {
+        const carCard = createCarCard(car);
+        container.appendChild(carCard);
+      });
+
+      container.style.display = 'grid';
+    }
+
+    // Criar card do carro
+    function createCarCard(car) {
+      const card = document.createElement('div');
+      card.className = 'car-card available';
+      card.id = `car-${car.carId}`;
+
+      card.innerHTML = `
+        <div class="car-id">Carro ${car.carId}</div>
+        <div class="car-status status-available">Disponível</div>
+        <div class="car-video">
+          ${car.streamUrl ? 
+            `<img src="${car.streamUrl}" alt="Stream do Carro ${car.carId}">` : 
+            'Stream não disponível'
+          }
+        </div>
+        <button class="select-btn" onclick="selectCar('${car.carId}')">
+          Selecionar Carro
+        </button>
+      `;
+
+      return card;
+    }
+
+    // Selecionar carro
+    function selectCar(carId) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: "select_car",
+          userId: currentUser,
+          carId: carId
+        }));
+      } else {
+        showError('Conexão perdida. Tentando reconectar...');
+        connectWebSocket();
+      }
+    }
+
+    // Mostrar erro
+    function showError(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+
+    // Mostrar sucesso
+    function showSuccess(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.style.background = '#27ae60';
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+        errorDiv.style.background = '#e74c3c';
+      }, 3000);
+    }
+
+    // Inicializar página
+    function init() {
+      checkAuth();
+      connectWebSocket();
+    }
+
+    // Iniciar quando a página carregar
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
