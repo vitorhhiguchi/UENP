@@ -1,0 +1,133 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    --background: #FAFAFA;
+    --background-header: #d62976;
+    --black: #000;
+    --white: #FFFFFF;
+
+    background-color: var(--background);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5; /* Melhora a legibilidade */
+}
+
+a {
+    color: gray;
+    font-weight: bold;
+}
+
+.wrapper {
+    width: 100%;
+}
+
+header {
+    width: 100%;
+    height: 80px;
+    background-color: var(--background-header); 
+    border-bottom: 1px solid #e6e6e6; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px; 
+}
+
+header h1 {
+    color: var(--white);
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto; 
+    padding: 0 15px; 
+}
+
+.column {
+    width: 100%;
+}
+
+
+.perfil {
+    display: flex;
+    flex-direction: row;
+    align-items: center; 
+}
+
+.perfil img {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    object-fit: cover; 
+}
+
+.perfil p {
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 12px;
+}
+
+.post {
+    margin-top: 15px;
+}
+
+.post img {
+    max-width: 90%;
+    display: block;
+    margin: 0 auto; 
+    border-radius: 8px;
+    transition: transform 0.3s ease; 
+    border: 1px solid #e6e6e6;
+}
+
+.post img:hover {
+    transform: scale(1.01);
+}
+
+.interagir {
+    display: flex;
+    margin-top: 10px;
+}
+
+.interagir a {
+    text-decoration: none; 
+}
+
+.interagir a:hover {
+    text-decoration: underline;
+}
+
+.mais-a-direita {
+    margin-left: 15px;
+}
+
+.post-card {
+    background-color: var(--white);
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px; 
+}
+
+.post-description {
+    margin-top: 10px; 
+    font-size: 14px; 
+    line-height: 1.4;
+    color: #333; 
+}
+
+footer {
+    background-color: var(--background-header); 
+    padding: 20px 0; 
+    width: 100%;
+    text-align: center; 
+}
+
+footer p {
+    color: white; 
+    font-weight: bold; 
+    font-size: 16px; 
+}
