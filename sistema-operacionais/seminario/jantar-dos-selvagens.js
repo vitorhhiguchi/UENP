@@ -1,96 +1,86 @@
-// savage-dinner.js
-const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
-const { performance } = require('perf_hooks');
-
-const NUM_SELVAGENS = 5;
-const PORCOES_NO_CALDEIRAO = 10;
-
-// --- Recursos Compartilhados ---
-const sharedBuffer = new SharedArrayBuffer(4 * 4);
-const porcoes = new Int32Array(sharedBuffer, 0, 1);
-const mcaldMutex = new Int32Array(sharedBuffer, 4, 1);
-const caldVazioSem = new Int32Array(sharedBuffer, 8, 1);
-const caldCheioSem = new Int32Array(sharedBuffer, 12, 1);
-
-// --- Funções de Sincronização (reutilizadas) ---
-function mutexLock(mutex) {
-    while (Atomics.compareExchange(mutex, 0, 0, 1) !== 0) {
-        Atomics.wait(mutex, 0, 1);
+// Simulação de Semáforos e Mutex para fins didáticos
+class Semaphore {
+    constructor(initialCount = 1) {
+        this.count = initialCount;
+        this.waitQueue = [];
+    }
+    async down() {
+        if (this.count > 0) {
+            this.count--;
+            return;
+        }
+        return new Promise(resolve => this.waitQueue.push(resolve));
+    }
+    up() {
+        this.count++;
+        if (this.waitQueue.length > 0) {
+            const next = this.waitQueue.shift();
+            this.count--;
+            next();
+        }
     }
 }
-function mutexUnlock(mutex) {
-    Atomics.store(mutex, 0, 0);
-    Atomics.notify(mutex, 0, 1);
-}
-function semWait(semaphore) {
-    Atomics.sub(semaphore, 0, 1);
-    while (Atomics.load(semaphore, 0) < 0) {
-        Atomics.wait(semaphore, 0, Atomics.load(semaphore, 0));
-    }
-}
-function semPost(semaphore) {
-    Atomics.add(semaphore, 0, 1);
-    Atomics.notify(semaphore, 0, 1);
+class Mutex extends Semaphore {
+    constructor() { super(1); }
+    lock() { return this.down(); }
+    unlock() { this.up(); }
 }
 
-// --- Lógica das Threads ---
-function cozinheiro() {
+// --- Lógica do Problema ---
+const PORCOES_TOTAIS = 5;
+let porcoes = 0; // O caldeirão começa vazio
+
+// Semáforos e Mutex da solução
+const mcald = new Mutex();
+const cald_vazio = new Semaphore(0);
+const cald_cheio = new Semaphore(0);
+
+const randomDelay = () => new Promise(res => setTimeout(res, Math.random() * 1000 + 200));
+
+// Lógica do Cozinheiro
+async function cozinheiro() {
     while (true) {
-        console.log("Cozinheiro está dormindo...");
-        semWait(caldVazioSem);
+        console.log("Cozinheiro está dormindo... 😴");
+        await cald_vazio.down(); // Espera ser acordado
+        
+        console.log("%cCozinheiro foi acordado e está cozinhando...", 'color: fuchsia; font-weight: bold');
+        await randomDelay();
+        porcoes = PORCOES_TOTAIS;
+        console.log(`%cCozinheiro encheu o caldeirão com ${porcoes} porções.`, 'color: fuchsia; font-weight: bold');
 
-        console.log("Cozinheiro acordou! Enchendo o caldeirão...");
-        mutexLock(mcaldMutex); // Cozinheiro também precisa de lock para encher
-        Atomics.store(porcoes, 0, PORCOES_NO_CALDEIRAO);
-        mutexUnlock(mcaldMutex);
-
-        semPost(caldCheioSem);
+        cald_cheio.up(); // Avisa o selvagem que a comida está pronta
     }
 }
 
-function selvagem(id) {
+// Lógica do Selvagem
+async function selvagem(id) {
     while (true) {
-        console.log(`Selvagem ${id} está com fome.`);
-        mutexLock(mcaldMutex);
-
-        if (Atomics.load(porcoes, 0) === 0) {
-            console.log(`Selvagem ${id}: Caldeirão vazio! Acordando o cozinheiro.`);
-            semPost(caldVazioSem);
-            
-            // CORREÇÃO DO DEADLOCK: Destravar o mutex ANTES de esperar
-            mutexUnlock(mcaldMutex);
-            
-            semWait(caldCheioSem); // Espera o caldeirão encher
-            
-            // Re-adquire o lock para se servir
-            mutexLock(mcaldMutex);
+        console.log(`Selvagem ${id} está com fome e vai ao caldeirão.`);
+        
+        await mcald.lock();
+        
+        if (porcoes === 0) {
+            console.log(`%cSelvagem ${id} encontrou o caldeirão VAZIO! Acordando o cozinheiro.`, 'color: orange');
+            cald_vazio.up(); // Acorda o cozinheiro
+            await cald_cheio.down(); // Espera a comida ficar pronta
+            console.log(`%cSelvagem ${id} viu que o caldeirão está cheio e vai se servir.`, 'color: orange');
         }
 
-        Atomics.sub(porcoes, 0, 1);
-        const restantes = Atomics.load(porcoes, 0);
-        console.log(`  Selvagem ${id} se serviu. Restam: ${restantes}`);
-        
-        mutexUnlock(mcaldMutex);
+        porcoes--;
+        console.log(`Selvagem ${id} se serviu. Restam ${porcoes} porções.`);
 
-        console.log(`  Selvagem ${id} está comendo.`);
-        const delay = Math.random() * 3000 + 1000;
-        const start = performance.now();
-        while(performance.now() - start < delay);
+        mcald.unlock();
+
+        console.log(`Selvagem ${id} está comendo. 😋`);
+        await randomDelay(); // Simula o tempo de comer
     }
 }
 
-if (isMainThread) {
-    Atomics.store(porcoes, 0, PORCOES_NO_CALDEIRAO); // Começa cheio
-    Atomics.store(mcaldMutex, 0, 0);
-    Atomics.store(caldVazioSem, 0, 0);
-    Atomics.store(caldCheioSem, 0, 0);
+// Inicia a simulação
+console.log("Iniciando simulação do Jantar dos Selvagens...");
+cozinheiro(); 
 
-    new Worker(__filename, { workerData: { type: 'cozinheiro' } });
-    for (let i = 0; i < NUM_SELVAGENS; i++) {
-        new Worker(__filename, { workerData: { type: 'selvagem', id: i + 1 } });
-    }
-} else {
-    const { type, id } = workerData;
-    if (type === 'selvagem') selvagem(id);
-    else if (type === 'cozinheiro') cozinheiro();
-}
+// Inicia vários selvagens com um pequeno atraso entre eles
+setTimeout(() => selvagem(1), 500);
+setTimeout(() => selvagem(2), 1000);
+setTimeout(() => selvagem(3), 1500);
